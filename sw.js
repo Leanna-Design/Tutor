@@ -1,4 +1,4 @@
-const CACHE_NAME = "tutor-manager-v5";
+const CACHE_NAME = "tutor-manager-v6";
 
 const APP_FILES = [
     "./",
@@ -6,8 +6,8 @@ const APP_FILES = [
     "./styles.css",
     "./app.js",
     "./manifest.json",
-    "./icon-192.png",
-    "./icon-512.png"
+    "./icon-home-192.png",
+    "./icon-home-512.png"
 ];
 
 self.addEventListener("install", event => {
@@ -15,8 +15,16 @@ self.addEventListener("install", event => {
     event.waitUntil(
 
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(APP_FILES))
-            .then(() => self.skipWaiting())
+            .then(cache => {
+
+                return cache.addAll(APP_FILES);
+
+            })
+            .then(() => {
+
+                return self.skipWaiting();
+
+            })
 
     );
 
@@ -28,9 +36,9 @@ self.addEventListener("activate", event => {
     event.waitUntil(
 
         caches.keys()
-            .then(keys =>
+            .then(keys => {
 
-                Promise.all(
+                return Promise.all(
 
                     keys
                         .filter(
@@ -42,12 +50,14 @@ self.addEventListener("activate", event => {
                                 caches.delete(key)
                         )
 
-                )
+                );
 
-            )
-            .then(() =>
-                self.clients.claim()
-            )
+            })
+            .then(() => {
+
+                return self.clients.claim();
+
+            })
 
     );
 
@@ -69,9 +79,16 @@ self.addEventListener("fetch", event => {
         requestURL.origin !==
         self.location.origin
     ) {
+
         return;
+
     }
 
+
+    /*
+     * Always fetch the latest version first.
+     * If offline, use the cached version.
+     */
 
     event.respondWith(
 
@@ -82,7 +99,9 @@ self.addEventListener("fetch", event => {
                     !response ||
                     response.status !== 200
                 ) {
+
                     return response;
+
                 }
 
 
@@ -104,13 +123,13 @@ self.addEventListener("fetch", event => {
                 return response;
 
             })
-            .catch(() =>
+            .catch(() => {
 
-                caches.match(
+                return caches.match(
                     event.request
-                )
+                );
 
-            )
+            })
 
     );
 
