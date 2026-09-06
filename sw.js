@@ -1,32 +1,58 @@
-const CACHE_NAME = "tutor-manager-v4";
+const CACHE_NAME = "tutor-manager-v5";
 
 const APP_FILES = [
     "./",
     "./index.html",
-    "./style.css",
+    "./styles.css",
     "./app.js",
-    "./manifest.json"
+    "./manifest.json",
+    "./icon-192.png",
+    "./icon-512.png"
 ];
 
 self.addEventListener("install", event => {
+
     event.waitUntil(
+
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll(APP_FILES))
             .then(() => self.skipWaiting())
+
     );
+
 });
 
+
 self.addEventListener("activate", event => {
+
     event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
-                keys
-                    .filter(key => key !== CACHE_NAME)
-                    .map(key => caches.delete(key))
+
+        caches.keys()
+            .then(keys =>
+
+                Promise.all(
+
+                    keys
+                        .filter(
+                            key =>
+                                key !== CACHE_NAME
+                        )
+                        .map(
+                            key =>
+                                caches.delete(key)
+                        )
+
+                )
+
             )
-        ).then(() => self.clients.claim())
+            .then(() =>
+                self.clients.claim()
+            )
+
     );
+
 });
+
 
 self.addEventListener("fetch", event => {
 
@@ -34,9 +60,10 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    const requestURL = new URL(
-        event.request.url
-    );
+
+    const requestURL =
+        new URL(event.request.url);
+
 
     if (
         requestURL.origin !==
@@ -45,43 +72,46 @@ self.addEventListener("fetch", event => {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request)
-            .then(cachedResponse => {
 
-                if (cachedResponse) {
-                    return cachedResponse;
+    event.respondWith(
+
+        fetch(event.request)
+            .then(response => {
+
+                if (
+                    !response ||
+                    response.status !== 200
+                ) {
+                    return response;
                 }
 
-                return fetch(event.request)
-                    .then(response => {
 
-                        if (
-                            !response ||
-                            response.status !== 200
-                        ) {
-                            return response;
-                        }
+                const responseClone =
+                    response.clone();
 
-                        const responseClone =
-                            response.clone();
 
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-                                cache.put(
-                                    event.request,
-                                    responseClone
-                                );
-                            });
+                caches.open(CACHE_NAME)
+                    .then(cache => {
 
-                        return response;
-                    })
-                    .catch(() =>
-                        caches.match(
-                            "./index.html"
-                        )
-                    );
+                        cache.put(
+                            event.request,
+                            responseClone
+                        );
+
+                    });
+
+
+                return response;
 
             })
+            .catch(() =>
+
+                caches.match(
+                    event.request
+                )
+
+            )
+
     );
+
 });
