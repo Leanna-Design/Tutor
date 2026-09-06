@@ -10,7 +10,7 @@
 
     <meta
         name="theme-color"
-        content="#ffffff"
+        content="#f7f7f5"
     >
 
     <meta
@@ -42,124 +42,83 @@
 
     <link
         rel="stylesheet"
-        href="./style.css"
+        href="./styles.css"
     >
 
     <script
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
         defer
     ></script>
-
-    <style>
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-            background: #f6f7f9;
-        }
-
-        body {
-            padding-bottom: env(safe-area-inset-bottom);
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        button,
-        input,
-        select,
-        textarea {
-            font: inherit;
-        }
-
-        button {
-            touch-action: manipulation;
-        }
-
-        #offlineBanner {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 99999;
-            padding: 9px 14px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            background: #222;
-            color: #fff;
-        }
-
-        #offlineBanner.show {
-            display: block;
-        }
-
-        #appLoading {
-            position: fixed;
-            inset: 0;
-            z-index: 99998;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f6f7f9;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .safe-area-top {
-            padding-top: env(safe-area-inset-top);
-        }
-    </style>
 </head>
 
 <body>
 
-    <div
-        id="offlineBanner"
-        role="status"
-    >
-        🔴 Offline mode — changes will sync when you reconnect.
+    <div id="offlineBanner">
+        <span>●</span>
+        Offline mode
     </div>
 
-    <div
-        id="appLoading"
-        class="safe-area-top"
-    >
-        Tutor Manager
+    <div id="appLoading">
+        <div class="loading-box">
+            <div class="loading-logo">TM</div>
+            <div class="loading-title">
+                Tutor Manager
+            </div>
+            <div class="loading-subtitle">
+                Loading your workspace…
+            </div>
+        </div>
     </div>
 
     <script>
-        window.addEventListener("online", function () {
-            const banner =
-                document.getElementById("offlineBanner");
 
-            if (banner) {
-                banner.classList.remove("show");
+        window.addEventListener(
+            "online",
+            function () {
+
+                const banner =
+                    document.getElementById(
+                        "offlineBanner"
+                    );
+
+                if (banner) {
+                    banner.classList.remove("show");
+                }
+
+                if (
+                    typeof window.syncOfflineData ===
+                    "function"
+                ) {
+                    window.syncOfflineData();
+                }
+
             }
+        );
 
-            if (
-                typeof window.syncOfflineData ===
-                "function"
-            ) {
-                window.syncOfflineData();
+
+        window.addEventListener(
+            "offline",
+            function () {
+
+                const banner =
+                    document.getElementById(
+                        "offlineBanner"
+                    );
+
+                if (banner) {
+                    banner.classList.add("show");
+                }
+
             }
-        });
+        );
 
-        window.addEventListener("offline", function () {
-            const banner =
-                document.getElementById("offlineBanner");
-
-            if (banner) {
-                banner.classList.add("show");
-            }
-        });
 
         window.addEventListener(
             "load",
             function () {
 
                 if (!navigator.onLine) {
+
                     const banner =
                         document.getElementById(
                             "offlineBanner"
@@ -168,24 +127,32 @@
                     if (banner) {
                         banner.classList.add("show");
                     }
+
                 }
+
 
                 if (
                     "serviceWorker" in navigator
                 ) {
+
                     navigator.serviceWorker
                         .register("./sw.js")
                         .catch(function (error) {
+
                             console.error(
                                 "Service Worker registration failed:",
                                 error
                             );
+
                         });
+
                 }
 
             }
         );
+
     </script>
+
 
     <script
         src="./app.js"
