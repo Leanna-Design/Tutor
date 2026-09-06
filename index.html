@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -13,6 +15,13 @@
         content="#f7f7f5"
     >
 
+    <!-- PWA -->
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <!-- Apple PWA -->
     <meta
         name="apple-mobile-web-app-capable"
         content="yes"
@@ -28,88 +37,142 @@
         content="Tutor Manager"
     >
 
-    <title>Tutor Manager</title>
+    <!-- Apple Home Screen Icon -->
+    <link
+        rel="apple-touch-icon"
+        sizes="192x192"
+        href="./icon-home-192.png"
+    >
 
+    <link
+        rel="apple-touch-icon"
+        sizes="512x512"
+        href="./icon-home-512.png"
+    >
+
+    <!-- PWA Manifest -->
     <link
         rel="manifest"
         href="./manifest.json"
     >
 
-    <link
-        rel="apple-touch-icon"
-        href="./icon-192.png"
-    >
-
+    <!-- App stylesheet -->
     <link
         rel="stylesheet"
         href="./styles.css"
     >
 
+    <title>Tutor Manager</title>
+
+    <!-- Supabase -->
     <script
         src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
         defer
     ></script>
+
 </head>
+
 
 <body>
 
-    <div id="offlineBanner">
+
+    <!-- =====================================
+         OFFLINE BANNER
+    ====================================== -->
+
+    <div
+        id="offlineBanner"
+        role="status"
+        aria-live="polite"
+    >
+
         <span>●</span>
+
         Offline mode
+
     </div>
 
+
+    <!-- =====================================
+         APP LOADING
+    ====================================== -->
+
     <div id="appLoading">
+
         <div class="loading-box">
-            <div class="loading-logo">TM</div>
+
+            <div class="loading-logo">
+                TM
+            </div>
+
             <div class="loading-title">
                 Tutor Manager
             </div>
+
             <div class="loading-subtitle">
                 Loading your workspace…
             </div>
+
         </div>
+
     </div>
+
+
+    <!-- =====================================
+         OFFLINE / ONLINE DETECTION
+    ====================================== -->
 
     <script>
 
-        window.addEventListener(
-            "online",
-            function () {
+        function updateOfflineStatus() {
 
-                const banner =
-                    document.getElementById(
-                        "offlineBanner"
-                    );
+            const banner =
+                document.getElementById(
+                    "offlineBanner"
+                );
 
-                if (banner) {
-                    banner.classList.remove("show");
-                }
+
+            if (!banner) {
+                return;
+            }
+
+
+            if (navigator.onLine) {
+
+                banner.classList.remove(
+                    "show"
+                );
+
 
                 if (
                     typeof window.syncOfflineData ===
                     "function"
                 ) {
+
                     window.syncOfflineData();
+
                 }
 
+            } else {
+
+                banner.classList.add(
+                    "show"
+                );
+
             }
+
+        }
+
+
+        window.addEventListener(
+            "online",
+            updateOfflineStatus
         );
 
 
         window.addEventListener(
             "offline",
-            function () {
-
-                const banner =
-                    document.getElementById(
-                        "offlineBanner"
-                    );
-
-                if (banner) {
-                    banner.classList.add("show");
-                }
-
-            }
+            updateOfflineStatus
         );
 
 
@@ -117,34 +180,45 @@
             "load",
             function () {
 
-                if (!navigator.onLine) {
+                updateOfflineStatus();
 
-                    const banner =
-                        document.getElementById(
-                            "offlineBanner"
-                        );
 
-                    if (banner) {
-                        banner.classList.add("show");
-                    }
-
-                }
-
+                /*
+                 * Register Service Worker
+                 */
 
                 if (
-                    "serviceWorker" in navigator
+                    "serviceWorker" in
+                    navigator
                 ) {
 
                     navigator.serviceWorker
-                        .register("./sw.js")
-                        .catch(function (error) {
+                        .register(
+                            "./sw.js",
+                            {
+                                scope: "./"
+                            }
+                        )
+                        .then(
+                            registration => {
 
-                            console.error(
-                                "Service Worker registration failed:",
-                                error
-                            );
+                                console.log(
+                                    "Tutor Manager Service Worker registered:",
+                                    registration.scope
+                                );
 
-                        });
+                            }
+                        )
+                        .catch(
+                            error => {
+
+                                console.error(
+                                    "Service Worker registration failed:",
+                                    error
+                                );
+
+                            }
+                        );
 
                 }
 
@@ -154,10 +228,16 @@
     </script>
 
 
+    <!-- =====================================
+         MAIN APPLICATION
+    ====================================== -->
+
     <script
         src="./app.js"
         defer
     ></script>
 
+
 </body>
+
 </html>
