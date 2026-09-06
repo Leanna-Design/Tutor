@@ -7,9 +7,10 @@
 // ========================================
 // Replace these with your Supabase project values.
 const SUPABASE_URL =
-    "PASTE_YOUR_SUPABASE_URL";
+    "https://gbvcepsqigpwxphxdqav.supabase.co";
+
 const SUPABASE_KEY =
-    "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdidmNlcHNxaWdwd3hwaHhkcWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MTUzNzUsImV4cCI6MjEwNDE5MTM3NX0.Pt2K0bKYD7Y1cldssICjIu9DeeYOk-X0bg_xwCbk7sQ";
 // ========================================
 // SUPABASE CLIENT
 // ========================================
